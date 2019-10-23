@@ -51,11 +51,6 @@ int become_user(const char *username, int pid_fd) {
     create_needed_dir(netdata_configured_cache_dir, uid, gid);
     create_needed_dir(netdata_configured_varlib_dir, uid, gid);
 
-    if(pidfile[0]) {
-        if(chown(pidfile, uid, gid) == -1)
-            error("Cannot chown '%s' to %u:%u", pidfile, (unsigned int)uid, (unsigned int)gid);
-    }
-
     int ngroups = (int)sysconf(_SC_NGROUPS_MAX);
     gid_t *supplementary_groups = NULL;
     if(ngroups > 0) {
