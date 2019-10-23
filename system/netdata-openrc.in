@@ -23,7 +23,7 @@ extra_started_commands="reload rotate save"
 pidfile="@localstatedir_POST@/run/netdata.pid"
 command="@sbindir_POST@/netdata"
 command_args="-P ${pidfile} ${NETDATA_EXTRA_ARGS}"
-start_stop_daemon_args="-u ${NETDATA_OWNER}"
+start_stop_daemon_args="-u netdata"
 required_files="/etc/netdata/netdata.conf"
 if [ "${NETDATA_FORCE_EXIT}" -eq 1 ]; then
     retry="TERM/${NETDATA_WAIT_EXIT_TIMEOUT}/KILL/1"
