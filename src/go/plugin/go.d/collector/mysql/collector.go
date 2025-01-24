@@ -98,6 +98,8 @@ type Collector struct {
 
 	recheckGlobalVarsTime    time.Time
 	recheckGlobalVarsEvery   time.Duration
+	hasGCache                bool
+	varGCacheKeepPagesSize   int64
 	varInnoDBLogFileSize     int64
 	varInnoDBLogFilesInGroup int64
 	varMaxConns              int64

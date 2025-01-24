@@ -67,6 +67,11 @@ func (c *Collector) collect() (map[string]int64, error) {
 		}
 		c.recheckGlobalVarsTime = now
 	}
+
+	if c.hasGCache {
+		mx["gcache_keep_pages_size"] = c.varGCacheKeepPagesSize
+	}
+
 	mx["innodb_log_file_size"] = c.varInnoDBLogFileSize
 	mx["innodb_log_files_in_group"] = c.varInnoDBLogFilesInGroup
 	mx["innodb_log_group_capacity"] = c.varInnoDBLogFileSize * c.varInnoDBLogFilesInGroup
