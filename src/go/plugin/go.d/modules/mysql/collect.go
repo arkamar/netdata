@@ -58,6 +58,9 @@ func (m *MySQL) collect() (map[string]int64, error) {
 			return nil, fmt.Errorf("error on collecting global variables: %v", err)
 		}
 	}
+	if m.hasGCache {
+		mx["gcache_keep_pages_size"] = m.varGCacheKeepPagesSize
+	}
 	mx["innodb_log_file_size"] = m.varInnodbLogFileSize
 	mx["max_connections"] = m.varMaxConns
 	mx["table_open_cache"] = m.varTableOpenCache
