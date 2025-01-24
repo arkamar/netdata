@@ -62,6 +62,11 @@ func (m *MySQL) collect() (map[string]int64, error) {
 			return nil, fmt.Errorf("error on collecting global variables: %v", err)
 		}
 	}
+
+	if m.hasGCache {
+		mx["gcache_keep_pages_size"] = m.varGCacheKeepPagesSize
+	}
+
 	mx["innodb_log_file_size"] = m.varInnoDBLogFileSize
 	mx["innodb_log_files_in_group"] = m.varInnoDBLogFilesInGroup
 	mx["innodb_log_group_capacity"] = m.varInnoDBLogFileSize * m.varInnoDBLogFilesInGroup
