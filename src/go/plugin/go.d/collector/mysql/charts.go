@@ -62,6 +62,7 @@ const (
 	prioGaleraQueue
 	prioGaleraConflicts
 	prioGaleraFlowControl
+	prioGaleraGCache
 	prioGaleraClusterStatus
 	prioGaleraClusterState
 	prioGaleraClusterSize
@@ -700,6 +701,7 @@ var chartsGalera = module.Charts{
 	chartGaleraQueue.Copy(),
 	chartGaleraConflicts.Copy(),
 	chartGaleraFlowControl.Copy(),
+	chartGaleraGCacheKeepPagesSize.Copy(),
 	chartGaleraClusterStatus.Copy(),
 	chartGaleraClusterState.Copy(),
 	chartGaleraClusterSize.Copy(),
@@ -770,6 +772,18 @@ var (
 		Priority: prioGaleraFlowControl,
 		Dims: module.Dims{
 			{ID: "wsrep_flow_control_paused_ns", Name: "paused", Algo: module.Incremental, Div: 1000000},
+		},
+	}
+	chartGaleraGCacheKeepPagesSize = module.Chart{
+		ID:       "galera_gcache_keep_pages_size",
+		Title:    "GCache Keep Pages Size",
+		Units:    "MiB",
+		Fam:      "galera",
+		Ctx:      "mysql.galera_gcache",
+		Type:     module.Area,
+		Priority: prioGaleraGCache,
+		Dims: module.Dims{
+			{ID: "gcache_keep_pages_size", Name: "size", Div: 1024 * 1024},
 		},
 	}
 	chartGaleraClusterStatus = module.Chart{

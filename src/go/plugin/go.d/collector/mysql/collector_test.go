@@ -1190,6 +1190,7 @@ func TestCollector_Collect(t *testing.T) {
 						"created_tmp_disk_tables":                 4,
 						"created_tmp_files":                       5,
 						"created_tmp_tables":                      17,
+						"gcache_keep_pages_size":                  209715200,
 						"handler_commit":                          37,
 						"handler_delete":                          7,
 						"handler_prepare":                         0,
