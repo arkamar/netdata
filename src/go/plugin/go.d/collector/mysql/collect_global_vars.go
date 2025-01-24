@@ -2,6 +2,8 @@
 
 package mysql
 
+import "regexp"
+
 const (
 	queryShowGlobalVariables = `
 SHOW GLOBAL VARIABLES 
@@ -11,8 +13,11 @@ WHERE
   OR Variable_name LIKE 'disabled_storage_engines' 
   OR Variable_name LIKE 'log_bin'
   OR Variable_name LIKE 'innodb_log_file_size'
+  OR Variable_name LIKE 'wsrep_provider_options'
   OR Variable_name LIKE 'performance_schema';`
 )
+
+var reGCacheKeepPagesSize = regexp.MustCompile(`gcache\.keep_pages_size\s*=\s*(\d+)([KMGT]+);`)
 
 func (c *Collector) collectGlobalVariables() error {
 	// MariaDB: https://mariadb.com/kb/en/server-system-variables/
@@ -39,6 +44,25 @@ func (c *Collector) collectGlobalVariables() error {
 				c.varPerformanceSchema = value
 			case "table_open_cache":
 				c.varTableOpenCache = parseInt(value)
+			case "wsrep_provider_options":
+				match := reGCacheKeepPagesSize.FindStringSubmatch(value)
+				if len(match) >= 2 {
+					c.hasGCache = true
+					val := parseInt(match[1])
+					if len(match) == 3 {
+						switch match[2] {
+						case "K":
+							val *= 1024
+						case "M":
+							val *= 1024 * 1024
+						case "G":
+							val *= 1024 * 1024 * 1024
+						case "T":
+							val *= 1024 * 1024 * 1024 * 1024
+						}
+					}
+					c.varGCacheKeepPagesSize = val
+				}
 			}
 		}
 	})

@@ -6,4 +6,5 @@
 | max_connections        | 151       |
 | performance_schema     | ON        |
 | table_open_cache       | 2000      |
+| wsrep_provider_options |           |
 +------------------------+-----------+
