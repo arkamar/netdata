@@ -59,6 +59,7 @@ func (c *Collector) collect() (map[string]int64, error) {
 		}
 		c.recheckGlobalVarsTime = now
 	}
+	mx["innodb_log_file_size"] = c.varInnodbLogFileSize
 	mx["max_connections"] = c.varMaxConns
 	mx["table_open_cache"] = c.varTableOpenCache
 
