@@ -93,6 +93,7 @@ type Collector struct {
 
 	recheckGlobalVarsTime    time.Time
 	recheckGlobalVarsEvery   time.Duration
+	varInnodbLogFileSize     int64
 	varMaxConns              int64
 	varTableOpenCache        int64
 	varDisabledStorageEngine string

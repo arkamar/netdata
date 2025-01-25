@@ -1,7 +1,8 @@
-+------------------+-------+
-| Variable_name    | Value |
-+------------------+-------+
-| log_bin          | OFF   |
-| max_connections  | 100   |
-| table_open_cache | 400   |
-+------------------+-------+
++----------------------+---------+
+| Variable_name        | Value   |
++----------------------+---------+
+| innodb_log_file_size | 5242880 |
+| log_bin              | OFF     |
+| max_connections      | 100     |
+| table_open_cache     | 400     |
++----------------------+---------+

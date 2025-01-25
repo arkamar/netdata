@@ -102,6 +102,7 @@ var baseCharts = module.Charts{
 	chartInnoDBIOOperations.Copy(),
 	chartInnoDBPendingIOOperations.Copy(),
 	chartInnoDBLogOperations.Copy(),
+	chartInnoDBLogSize.Copy(),
 	chartInnoDBCurrentRowLocks.Copy(),
 	chartInnoDBRowsOperations.Copy(),
 	chartInnoDBBufferPoolPages.Copy(),
@@ -362,6 +363,17 @@ var (
 			{ID: "innodb_log_waits", Name: "waits", Algo: module.Incremental},
 			{ID: "innodb_log_write_requests", Name: "write requests", Algo: module.Incremental, Mul: -1},
 			{ID: "innodb_log_writes", Name: "writes", Algo: module.Incremental, Mul: -1},
+		},
+	}
+	chartInnoDBLogSize = module.Chart{
+		ID:       "innodb_log_file_size",
+		Title:    "InnoDB Log File Size",
+		Units:    "MiB",
+		Fam:      "innodb",
+		Ctx:      "mysql.innodb_log_file_size",
+		Priority: prioInnoDBLog,
+		Dims: module.Dims{
+			{ID: "innodb_log_file_size", Name: "size", Div: 1024 * 1024},
 		},
 	}
 	chartInnoDBCurrentRowLocks = module.Chart{
