@@ -51,6 +51,11 @@ func New() *MySQL {
 		collectedUsers:                 make(map[string]bool),
 
 		recheckGlobalVarsEvery: time.Minute * 10,
+
+		// innodb_log_files_in_group is available in mysql and <mariadb-10.6,
+		// otherwise it defaults to 1.
+		// see https://mariadb.com/kb/en/innodb-system-variables/#innodb_log_files_in_group
+		varInnoDBLogFilesInGroup: 1,
 	}
 }
 
@@ -90,6 +95,8 @@ type MySQL struct {
 
 	recheckGlobalVarsTime    time.Time
 	recheckGlobalVarsEvery   time.Duration
+	varInnoDBLogFileSize     int64
+	varInnoDBLogFilesInGroup int64
 	varMaxConns              int64
 	varTableOpenCache        int64
 	varDisabledStorageEngine string

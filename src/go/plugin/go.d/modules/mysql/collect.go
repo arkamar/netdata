@@ -58,6 +58,9 @@ func (m *MySQL) collect() (map[string]int64, error) {
 			return nil, fmt.Errorf("error on collecting global variables: %v", err)
 		}
 	}
+	mx["innodb_log_file_size"] = m.varInnoDBLogFileSize
+	mx["innodb_log_files_in_group"] = m.varInnoDBLogFilesInGroup
+	mx["innodb_log_group_capacity"] = m.varInnoDBLogFileSize * m.varInnoDBLogFilesInGroup
 	mx["max_connections"] = m.varMaxConns
 	mx["table_open_cache"] = m.varTableOpenCache
 
