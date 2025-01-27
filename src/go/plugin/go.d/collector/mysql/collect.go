@@ -73,6 +73,15 @@ func (c *Collector) collect() (map[string]int64, error) {
 		c.addBinlogOnce.Do(c.addBinlogCharts)
 	}
 
+	if c.Estimation {
+		c.estimateLogFileSize.Capacity = c.varInnodbLogFileSize
+		if written, ok := mx["innodb_os_log_written"]; ok {
+			c.estimateLogFileSize.Add(written, now)
+		}
+		mx["innodb_log_file_retention_time_estimation"] = c.estimateLogFileSize.Estimate(now).Milliseconds()
+		c.addHistoryEstimation.Do(c.addHistoryEstimationChart)
+	}
+
 	// TODO: perhaps make a decisions based on privileges? (SHOW GRANTS FOR CURRENT_USER();)
 	if c.doSlaveStatus {
 		if err := c.collectSlaveStatus(mx); err != nil {
