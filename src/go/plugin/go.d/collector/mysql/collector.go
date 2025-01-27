@@ -47,6 +47,7 @@ func New() *Collector {
 		addGaleraOnce:                  &sync.Once{},
 		addQCacheOnce:                  &sync.Once{},
 		addTableOpenCacheOverflowsOnce: &sync.Once{},
+		addHistoryEstimation:           &sync.Once{},
 		doDisableSessionQueryLog:       true,
 		doSlaveStatus:                  true,
 		doUserStatistics:               true,
@@ -79,6 +80,7 @@ type Collector struct {
 	addGaleraOnce                  *sync.Once
 	addQCacheOnce                  *sync.Once
 	addTableOpenCacheOverflowsOnce *sync.Once
+	addHistoryEstimation           *sync.Once
 
 	db *sql.DB
 
@@ -104,6 +106,8 @@ type Collector struct {
 	varDisabledStorageEngine string
 	varLogBin                string
 	varPerformanceSchema     string
+
+	estimateLogFileSize *retentionTimeEstimator
 }
 
 func (c *Collector) Configuration() any {
@@ -132,6 +136,8 @@ func (c *Collector) Init(context.Context) error {
 	c.safeDSN = cfg.FormatDSN()
 
 	c.Debugf("using DSN [%s]", c.DSN)
+
+	c.estimateLogFileSize = newRetentionTimeEstimator()
 
 	return nil
 }
