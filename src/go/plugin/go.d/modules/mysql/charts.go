@@ -1263,3 +1263,23 @@ func (m *MySQL) addTableOpenCacheOverflowChart() {
 		m.Warning(err)
 	}
 }
+
+var (
+	chartInnoDBLogTimeEstim = module.Chart{
+		ID:       "innodb_log_file_retention_time_estimation",
+		Title:    "Innodb Log File Retention Time Estimation",
+		Units:    "seconds",
+		Fam:      "innodb",
+		Ctx:      "mysql.innodb_log_file",
+		Priority: prioInnoDBLog,
+		Dims: module.Dims{
+			{ID: "innodb_log_file_retention_time_estimation", Name: "estimation", Div: 1000},
+		},
+	}
+)
+
+func (m *MySQL) addHistoryEstimationChart() {
+	if err := m.Charts().Add(chartInnoDBLogTimeEstim.Copy()); err != nil {
+		m.Warning(err)
+	}
+}

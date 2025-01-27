@@ -45,6 +45,7 @@ func New() *MySQL {
 		addGaleraOnce:                  &sync.Once{},
 		addQCacheOnce:                  &sync.Once{},
 		addTableOpenCacheOverflowsOnce: &sync.Once{},
+		addHistoryEstimation:           &sync.Once{},
 		doDisableSessionQueryLog:       true,
 		doSlaveStatus:                  true,
 		doUserStatistics:               true,
@@ -76,6 +77,7 @@ type MySQL struct {
 	addGaleraOnce                  *sync.Once
 	addQCacheOnce                  *sync.Once
 	addTableOpenCacheOverflowsOnce *sync.Once
+	addHistoryEstimation           *sync.Once
 
 	db *sql.DB
 
@@ -101,6 +103,8 @@ type MySQL struct {
 	varDisabledStorageEngine string
 	varLogBin                string
 	varPerformanceSchema     string
+
+	estimateLogFileSize *retentionTimeEstimator
 }
 
 func (m *MySQL) Configuration() any {
@@ -132,6 +136,8 @@ func (m *MySQL) Init() error {
 	m.safeDSN = cfg.FormatDSN()
 
 	m.Debugf("using DSN [%s]", m.DSN)
+
+	m.estimateLogFileSize = newRetentionTimeEstimator()
 
 	return nil
 }

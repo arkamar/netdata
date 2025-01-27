@@ -72,6 +72,15 @@ func (m *MySQL) collect() (map[string]int64, error) {
 		m.addBinlogOnce.Do(m.addBinlogCharts)
 	}
 
+	if m.Estimation {
+		m.estimateLogFileSize.Capacity = m.varInnodbLogFileSize
+		if written, ok := mx["innodb_os_log_written"]; ok {
+			m.estimateLogFileSize.Add(written, now)
+		}
+		mx["innodb_log_file_retention_time_estimation"] = m.estimateLogFileSize.Estimate(now).Milliseconds()
+		m.addHistoryEstimation.Do(m.addHistoryEstimationChart)
+	}
+
 	// TODO: perhaps make a decisions based on privileges? (SHOW GRANTS FOR CURRENT_USER();)
 	if m.doSlaveStatus {
 		if err := m.collectSlaveStatus(mx); err != nil {
