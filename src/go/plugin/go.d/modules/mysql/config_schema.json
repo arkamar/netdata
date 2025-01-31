@@ -28,6 +28,17 @@
         "title": "my.cnf path",
         "description": "Optional. Specifies the path to the my.cnf file containing connection settings under the [client] section.",
         "type": "string"
+      },
+      "retention_time_estimation": {
+        "title": "History estimation",
+        "description": "Enable retention time estimation",
+        "type": "boolean"
+      },
+      "retention_time_estimation_interval": {
+        "title": "Estimation interval",
+        "description": "Update interval for retention time estimation, in seconds.",
+        "type": "number",
+        "default": 60
       }
     },
     "required": [
