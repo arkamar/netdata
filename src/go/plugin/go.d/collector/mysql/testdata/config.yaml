@@ -3,3 +3,5 @@ update_every: 123
 dsn: "ok"
 my.cnf: "ok"
 timeout: 123.123
+retention_time_estimation: true
+retention_time_estimation_interval: 123

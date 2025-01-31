@@ -34,8 +34,9 @@ func init() {
 func New() *Collector {
 	return &Collector{
 		Config: Config{
-			DSN:     "root@tcp(localhost:3306)/",
-			Timeout: confopt.Duration(time.Second),
+			DSN:                "root@tcp(localhost:3306)/",
+			Timeout:            confopt.Duration(time.Second),
+			EstimationInterval: confopt.Duration(time.Minute),
 		},
 
 		charts:                         baseCharts.Copy(),
@@ -57,11 +58,13 @@ func New() *Collector {
 }
 
 type Config struct {
-	Vnode       string           `yaml:"vnode,omitempty" json:"vnode"`
-	UpdateEvery int              `yaml:"update_every,omitempty" json:"update_every"`
-	DSN         string           `yaml:"dsn" json:"dsn"`
-	MyCNF       string           `yaml:"my.cnf,omitempty" json:"my.cnf"`
-	Timeout     confopt.Duration `yaml:"timeout,omitempty" json:"timeout"`
+	Vnode              string           `yaml:"vnode,omitempty" json:"vnode"`
+	UpdateEvery        int              `yaml:"update_every,omitempty" json:"update_every"`
+	DSN                string           `yaml:"dsn" json:"dsn"`
+	MyCNF              string           `yaml:"my.cnf,omitempty" json:"my.cnf"`
+	Timeout            confopt.Duration `yaml:"timeout,omitempty" json:"timeout"`
+	Estimation         bool             `yaml:"retention_time_estimation,omitempty" json:"retention_time_estimation"`
+	EstimationInterval confopt.Duration `yaml:"retention_time_estimation_interval,omitempty" json:"retention_time_estimation_interval"`
 }
 
 type Collector struct {
