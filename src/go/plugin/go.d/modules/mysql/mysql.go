@@ -32,8 +32,9 @@ func init() {
 func New() *MySQL {
 	return &MySQL{
 		Config: Config{
-			DSN:     "root@tcp(localhost:3306)/",
-			Timeout: web.Duration(time.Second),
+			DSN:                "root@tcp(localhost:3306)/",
+			Timeout:            web.Duration(time.Second),
+			EstimationInterval: web.Duration(time.Minute),
 		},
 
 		charts:                         baseCharts.Copy(),
@@ -60,10 +61,12 @@ func New() *MySQL {
 }
 
 type Config struct {
-	UpdateEvery int          `yaml:"update_every,omitempty" json:"update_every"`
-	DSN         string       `yaml:"dsn" json:"dsn"`
-	MyCNF       string       `yaml:"my.cnf,omitempty" json:"my.cnf"`
-	Timeout     web.Duration `yaml:"timeout,omitempty" json:"timeout"`
+	UpdateEvery        int          `yaml:"update_every,omitempty" json:"update_every"`
+	DSN                string       `yaml:"dsn" json:"dsn"`
+	MyCNF              string       `yaml:"my.cnf,omitempty" json:"my.cnf"`
+	Timeout            web.Duration `yaml:"timeout,omitempty" json:"timeout"`
+	Estimation         bool         `yaml:"retention_time_estimation,omitempty" json:"retention_time_estimation"`
+	EstimationInterval web.Duration `yaml:"retention_time_estimation_interval,omitempty" json:"retention_time_estimation_interval"`
 }
 
 type MySQL struct {
