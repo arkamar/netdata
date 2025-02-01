@@ -78,6 +78,15 @@ func (m *MySQL) collect() (map[string]int64, error) {
 			m.estimateLogFileSize.Add(written, now)
 		}
 		mx["innodb_log_file_retention_time_estimation"] = m.estimateLogFileSize.Estimate(now).Milliseconds()
+
+		if m.hasGCache {
+			m.estimateGCacheHistory.Capacity = m.varGCacheKeepPagesSize
+			if written, ok := mx["wsrep_replicated_bytes"]; ok {
+				m.estimateGCacheHistory.Add(written, now)
+			}
+			mx["gcache_keep_pages_size_history_estimation"] = m.estimateGCacheHistory.Estimate(now).Milliseconds()
+		}
+
 		m.addHistoryEstimation.Do(m.addHistoryEstimationChart)
 	}
 

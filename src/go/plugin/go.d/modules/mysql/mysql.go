@@ -104,7 +104,8 @@ type MySQL struct {
 	varLogBin                string
 	varPerformanceSchema     string
 
-	estimateLogFileSize *retentionTimeEstimator
+	estimateLogFileSize   *retentionTimeEstimator
+	estimateGCacheHistory *retentionTimeEstimator
 }
 
 func (m *MySQL) Configuration() any {
@@ -138,6 +139,7 @@ func (m *MySQL) Init() error {
 	m.Debugf("using DSN [%s]", m.DSN)
 
 	m.estimateLogFileSize = newRetentionTimeEstimator()
+	m.estimateGCacheHistory = newRetentionTimeEstimator()
 
 	return nil
 }
