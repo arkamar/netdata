@@ -107,7 +107,8 @@ type Collector struct {
 	varLogBin                string
 	varPerformanceSchema     string
 
-	estimateLogFileSize *retentionTimeEstimator
+	estimateLogFileSize   *retentionTimeEstimator
+	estimateGCacheHistory *retentionTimeEstimator
 }
 
 func (c *Collector) Configuration() any {
@@ -138,6 +139,7 @@ func (c *Collector) Init(context.Context) error {
 	c.Debugf("using DSN [%s]", c.DSN)
 
 	c.estimateLogFileSize = newRetentionTimeEstimator()
+	c.estimateGCacheHistory = newRetentionTimeEstimator()
 
 	return nil
 }

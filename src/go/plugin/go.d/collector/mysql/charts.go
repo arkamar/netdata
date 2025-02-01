@@ -1276,10 +1276,27 @@ var (
 			{ID: "innodb_log_file_retention_time_estimation", Name: "estimation", Div: 1000},
 		},
 	}
+	chartGCacheKeepPagesSizeHistoryEstimation = module.Chart{
+		ID:       "gcache_keep_pages_size_history_estimation",
+		Title:    "GCache history estimation",
+		Units:    "seconds",
+		Fam:      "gcache",
+		Ctx:      "gcache",
+		Priority: prioGaleraGCache,
+		Dims: module.Dims{
+			{ID: "gcache_keep_pages_size_history_estimation", Name: "estimation", Div: 1000},
+		},
+	}
 )
 
 func (c *Collector) addHistoryEstimationChart() {
 	if err := c.Charts().Add(chartInnoDBLogTimeEstim.Copy()); err != nil {
 		c.Warning(err)
+	}
+
+	if c.hasGCache {
+		if err := c.Charts().Add(chartGCacheKeepPagesSizeHistoryEstimation.Copy()); err != nil {
+			c.Warning(err)
+		}
 	}
 }
