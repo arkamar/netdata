@@ -1290,3 +1290,25 @@ func (m *MySQL) addTableOpenCacheOverflowChart() {
 		m.Warning(err)
 	}
 }
+
+var (
+	chartGCacheKeepPagesSizeHistoryEstimation = module.Chart{
+		ID:       "gcache_keep_pages_size_history_estimation",
+		Title:    "GCache history estimation",
+		Units:    "seconds",
+		Fam:      "gcache",
+		Ctx:      "gcache",
+		Priority: prioGaleraGCache,
+		Dims: module.Dims{
+			{ID: "gcache_keep_pages_size_history_estimation", Name: "estimation", Div: 1000},
+		},
+	}
+)
+
+func (m *MySQL) addHistoryEstimationChart() {
+	if m.hasGCache {
+		if err := m.Charts().Add(chartGCacheKeepPagesSizeHistoryEstimation.Copy()); err != nil {
+			m.Warning(err)
+		}
+	}
+}

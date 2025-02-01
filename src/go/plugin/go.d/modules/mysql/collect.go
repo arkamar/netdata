@@ -81,6 +81,18 @@ func (m *MySQL) collect() (map[string]int64, error) {
 		m.addBinlogOnce.Do(m.addBinlogCharts)
 	}
 
+	if m.Estimation {
+		if m.hasGCache {
+			m.estimateGCacheHistory.Capacity = m.varGCacheKeepPagesSize
+			if written, ok := mx["wsrep_replicated_bytes"]; ok {
+				m.estimateGCacheHistory.Add(written, now)
+			}
+			mx["gcache_keep_pages_size_history_estimation"] = m.estimateGCacheHistory.Estimate(now).Milliseconds()
+		}
+
+		m.addHistoryEstimation.Do(m.addHistoryEstimationChart)
+	}
+
 	// TODO: perhaps make a decisions based on privileges? (SHOW GRANTS FOR CURRENT_USER();)
 	if m.doSlaveStatus {
 		if err := m.collectSlaveStatus(mx); err != nil {
