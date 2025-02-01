@@ -87,6 +87,18 @@ func (c *Collector) collect() (map[string]int64, error) {
 		c.addBinlogOnce.Do(c.addBinlogCharts)
 	}
 
+	if c.Estimation {
+		if c.hasGCache {
+			c.estimateGCacheHistory.Capacity = c.varGCacheKeepPagesSize
+			if written, ok := mx["wsrep_replicated_bytes"]; ok {
+				c.estimateGCacheHistory.Add(written, now)
+			}
+			mx["gcache_keep_pages_size_history_estimation"] = c.estimateGCacheHistory.Estimate(now).Milliseconds()
+		}
+
+		c.addHistoryEstimation.Do(c.addHistoryEstimationChart)
+	}
+
 	// TODO: perhaps make a decisions based on privileges? (SHOW GRANTS FOR CURRENT_USER();)
 	if c.doSlaveStatus {
 		if err := c.collectSlaveStatus(mx); err != nil {

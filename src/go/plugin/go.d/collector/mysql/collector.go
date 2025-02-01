@@ -47,6 +47,7 @@ func New() *Collector {
 		addGaleraOnce:                  &sync.Once{},
 		addQCacheOnce:                  &sync.Once{},
 		addTableOpenCacheOverflowsOnce: &sync.Once{},
+		addHistoryEstimation:           &sync.Once{},
 		doDisableSessionQueryLog:       true,
 		doSlaveStatus:                  true,
 		doUserStatistics:               true,
@@ -59,6 +60,8 @@ func New() *Collector {
 		// otherwise it defaults to 1.
 		// see https://mariadb.com/kb/en/innodb-system-variables/#innodb_log_files_in_group
 		varInnoDBLogFilesInGroup: 1,
+
+		estimateGCacheHistory: newRetentionTimeEstimator(),
 	}
 }
 
@@ -84,6 +87,7 @@ type Collector struct {
 	addGaleraOnce                  *sync.Once
 	addQCacheOnce                  *sync.Once
 	addTableOpenCacheOverflowsOnce *sync.Once
+	addHistoryEstimation           *sync.Once
 
 	db *sql.DB
 
@@ -110,6 +114,8 @@ type Collector struct {
 	varDisabledStorageEngine string
 	varLogBin                string
 	varPerformanceSchema     string
+
+	estimateGCacheHistory *retentionTimeEstimator
 }
 
 func (c *Collector) Configuration() any {
