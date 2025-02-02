@@ -109,6 +109,7 @@ type Collector struct {
 
 	estimateLogFileSize   *retentionTimeEstimator
 	estimateGCacheHistory *retentionTimeEstimator
+	updateEstimationTime  time.Time
 }
 
 func (c *Collector) Configuration() any {
