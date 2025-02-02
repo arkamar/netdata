@@ -113,6 +113,7 @@ type MySQL struct {
 	varPerformanceSchema     string
 
 	estimateGCacheHistory *retentionTimeEstimator
+	updateEstimationTime  time.Time
 }
 
 func (m *MySQL) Configuration() any {

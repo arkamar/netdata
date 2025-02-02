@@ -82,9 +82,13 @@ func (m *MySQL) collect() (map[string]int64, error) {
 	}
 
 	if m.Estimation {
+		timeToUpdate := now.Sub(m.updateEstimationTime) > time.Duration(m.EstimationInterval)
+		if timeToUpdate {
+			m.updateEstimationTime = now
+		}
 		if m.hasGCache {
 			m.estimateGCacheHistory.Capacity = m.varGCacheKeepPagesSize
-			if written, ok := mx["wsrep_replicated_bytes"]; ok {
+			if written, ok := mx["wsrep_replicated_bytes"]; ok && timeToUpdate {
 				m.estimateGCacheHistory.Add(written, now)
 			}
 			mx["gcache_keep_pages_size_history_estimation"] = m.estimateGCacheHistory.Estimate(now).Milliseconds()
