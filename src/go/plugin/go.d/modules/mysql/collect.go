@@ -73,15 +73,19 @@ func (m *MySQL) collect() (map[string]int64, error) {
 	}
 
 	if m.Estimation {
+		timeToUpdate := now.Sub(m.updateEstimationTime) > time.Duration(m.EstimationInterval)
+		if timeToUpdate {
+			m.updateEstimationTime = now
+		}
 		m.estimateLogFileSize.Capacity = m.varInnodbLogFileSize
-		if written, ok := mx["innodb_os_log_written"]; ok {
+		if written, ok := mx["innodb_os_log_written"]; ok && timeToUpdate {
 			m.estimateLogFileSize.Add(written, now)
 		}
 		mx["innodb_log_file_retention_time_estimation"] = m.estimateLogFileSize.Estimate(now).Milliseconds()
 
 		if m.hasGCache {
 			m.estimateGCacheHistory.Capacity = m.varGCacheKeepPagesSize
-			if written, ok := mx["wsrep_replicated_bytes"]; ok {
+			if written, ok := mx["wsrep_replicated_bytes"]; ok && timeToUpdate {
 				m.estimateGCacheHistory.Add(written, now)
 			}
 			mx["gcache_keep_pages_size_history_estimation"] = m.estimateGCacheHistory.Estimate(now).Milliseconds()

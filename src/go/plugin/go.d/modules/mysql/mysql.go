@@ -106,6 +106,7 @@ type MySQL struct {
 
 	estimateLogFileSize   *retentionTimeEstimator
 	estimateGCacheHistory *retentionTimeEstimator
+	updateEstimationTime  time.Time
 }
 
 func (m *MySQL) Configuration() any {
