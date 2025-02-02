@@ -88,9 +88,13 @@ func (c *Collector) collect() (map[string]int64, error) {
 	}
 
 	if c.Estimation {
+		timeToUpdate := now.Sub(c.updateEstimationTime) > time.Duration(c.EstimationInterval)
+		if timeToUpdate {
+			c.updateEstimationTime = now
+		}
 		if c.hasGCache {
 			c.estimateGCacheHistory.Capacity = c.varGCacheKeepPagesSize
-			if written, ok := mx["wsrep_replicated_bytes"]; ok {
+			if written, ok := mx["wsrep_replicated_bytes"]; ok && timeToUpdate {
 				c.estimateGCacheHistory.Add(written, now)
 			}
 			mx["gcache_keep_pages_size_history_estimation"] = c.estimateGCacheHistory.Estimate(now).Milliseconds()

@@ -116,6 +116,7 @@ type Collector struct {
 	varPerformanceSchema     string
 
 	estimateGCacheHistory *retentionTimeEstimator
+	updateEstimationTime  time.Time
 }
 
 func (c *Collector) Configuration() any {
