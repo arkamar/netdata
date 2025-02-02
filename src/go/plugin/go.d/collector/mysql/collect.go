@@ -74,15 +74,19 @@ func (c *Collector) collect() (map[string]int64, error) {
 	}
 
 	if c.Estimation {
+		timeToUpdate := now.Sub(c.updateEstimationTime) > time.Duration(c.EstimationInterval)
+		if timeToUpdate {
+			c.updateEstimationTime = now
+		}
 		c.estimateLogFileSize.Capacity = c.varInnodbLogFileSize
-		if written, ok := mx["innodb_os_log_written"]; ok {
+		if written, ok := mx["innodb_os_log_written"]; ok && timeToUpdate {
 			c.estimateLogFileSize.Add(written, now)
 		}
 		mx["innodb_log_file_retention_time_estimation"] = c.estimateLogFileSize.Estimate(now).Milliseconds()
 
 		if c.hasGCache {
 			c.estimateGCacheHistory.Capacity = c.varGCacheKeepPagesSize
-			if written, ok := mx["wsrep_replicated_bytes"]; ok {
+			if written, ok := mx["wsrep_replicated_bytes"]; ok && timeToUpdate {
 				c.estimateGCacheHistory.Add(written, now)
 			}
 			mx["gcache_keep_pages_size_history_estimation"] = c.estimateGCacheHistory.Estimate(now).Milliseconds()
