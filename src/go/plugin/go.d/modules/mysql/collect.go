@@ -36,6 +36,10 @@ func (m *MySQL) collect() (map[string]int64, error) {
 		return nil, fmt.Errorf("error on collecting global status: %v", err)
 	}
 
+	if err := m.collectEngineInnoDBStatus(mx); err != nil {
+		return nil, fmt.Errorf("error on collecting engine innodb status: %v", err)
+	}
+
 	if hasInnodbOSLog(mx) {
 		m.addInnoDBOSLogOnce.Do(m.addInnoDBOSLogCharts)
 	}
