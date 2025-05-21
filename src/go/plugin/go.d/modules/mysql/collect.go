@@ -66,6 +66,7 @@ func (m *MySQL) collect() (map[string]int64, error) {
 		mx["gcache_keep_pages_size"] = m.varGCacheKeepPagesSize
 	}
 	mx["innodb_log_file_size"] = m.varInnodbLogFileSize
+	mx["innodb_log_files_in_group"] = m.varInnodbLogFilesInGroup
 	mx["max_connections"] = m.varMaxConns
 	mx["table_open_cache"] = m.varTableOpenCache
 

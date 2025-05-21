@@ -13,6 +13,7 @@ WHERE
   OR Variable_name LIKE 'disabled_storage_engines' 
   OR Variable_name LIKE 'log_bin'
   OR Variable_name LIKE 'innodb_log_file_size'
+  OR Variable_name LIKE 'innodb_log_files_in_group'
   OR Variable_name LIKE 'wsrep_provider_options'
   OR Variable_name LIKE 'performance_schema';`
 )
@@ -36,6 +37,8 @@ func (m *MySQL) collectGlobalVariables() error {
 				m.varDisabledStorageEngine = value
 			case "innodb_log_file_size":
 				m.varInnodbLogFileSize = parseInt(value)
+			case "innodb_log_files_in_group":
+				m.varInnodbLogFilesInGroup = parseInt(value)
 			case "log_bin":
 				m.varLogBin = value
 			case "max_connections":
