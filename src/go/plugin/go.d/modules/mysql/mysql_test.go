@@ -1718,6 +1718,97 @@ func mockExpectErr(mock sqlmock.Sqlmock, query string) {
 	mock.ExpectQuery(query).WillReturnError(fmt.Errorf("mock error (%s)", query))
 }
 
+func TestPrepareMockRows(t *testing.T) {
+	tests := []struct {
+		name string
+		data string
+		rows *sqlmock.Rows
+	}{{
+		name: "simple one row",
+		data: `
++------+-------+
+| Name | Value |
++------+-------+
+| a    | 1     |
++------+-------+
+`,
+		rows: sqlmock.NewRows([]string{"Name", "Value"}).
+			AddRow("a", "1"),
+	}, {
+		name: "simple two rows",
+		data: `
++------+-------+
+| Name | Value |
++------+-------+
+| a    | 1     |
+| b    | 2     |
++------+-------+
+`,
+		rows: sqlmock.NewRows([]string{"Name", "Value"}).
+			AddRow("a", "1").AddRow("b", "2"),
+	}, {
+		name: "simple row with string separated value",
+		data: `
++------+-------+
+| Name | Value |
++------+-------+
+| a    | 1 2   |
++------+-------+
+`,
+		rows: sqlmock.NewRows([]string{"Name", "Value"}).
+			AddRow("a", "1 2"),
+	}, {
+		name: "column with multiline text",
+		data: `
++------+-------+
+| Name | Value |
++------+-------+
+| a    | v
+b c
+d |
++------+-------+
+`,
+		rows: sqlmock.NewRows([]string{"Name", "Value"}).
+			AddRow("a", "v\nb c\nd"),
+	}, {
+		name: "column with multiline text on next line",
+		data: `
++------+-------+
+| Name | Value |
++------+-------+
+| a    | 
+test test
+test
+ |
++------+-------+
+`,
+		rows: sqlmock.NewRows([]string{"Name", "Value"}).
+			AddRow("a", "\ntest test\ntest\n"),
+	}, {
+		name: "column with multiline text in first column",
+		data: `
++-------+------+
+| Value | Name |
++-------+------+
+| 
+test test
+test
+ | a    |
++-------+------+
+`,
+		rows: sqlmock.NewRows([]string{"Value", "Name"}).
+			AddRow("\ntest test\ntest\n", "a"),
+	}}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			out, err := prepareMockRows([]byte(test.data))
+			assert.NoError(t, err)
+			assert.Equal(t, test.rows, out)
+		})
+	}
+}
+
 func prepareMockRows(data []byte) (*sqlmock.Rows, error) {
 	if len(data) == 0 {
 		return sqlmock.NewRows(nil), nil
@@ -1728,9 +1819,11 @@ func prepareMockRows(data []byte) (*sqlmock.Rows, error) {
 
 	var numColumns int
 	var rows *sqlmock.Rows
+	var rowLines []string
 
 	for sc.Scan() {
-		s := strings.TrimSpace(strings.Trim(sc.Text(), "|"))
+		line := sc.Text()
+		s := strings.TrimSpace(line)
 		switch {
 		case s == "",
 			strings.HasPrefix(s, "+"),
@@ -1738,26 +1831,27 @@ func prepareMockRows(data []byte) (*sqlmock.Rows, error) {
 			continue
 		}
 
-		parts := strings.Split(s, "|")
-		for i, v := range parts {
-			parts[i] = strings.TrimSpace(v)
-		}
-
+		// grab header first
 		if rows == nil {
+			parts := splitCells(line)
 			numColumns = len(parts)
 			rows = sqlmock.NewRows(parts)
 			continue
 		}
 
-		if len(parts) != numColumns {
-			return nil, fmt.Errorf("prepareMockRows(): columns != values (%d/%d)", numColumns, len(parts))
+		// row-delimiter reached ⇒ flush current row (if any)
+		if strings.Count(s, "|")-1 == numColumns || (rowLines != nil && strings.HasSuffix(s, "|")) {
+			vals, err := buildRow(append(rowLines, line), numColumns)
+			if err != nil {
+				return nil, err
+			}
+			rows.AddRow(vals...)
+			rowLines = nil
+			continue
 		}
 
-		values := make([]driver.Value, len(parts))
-		for i, v := range parts {
-			values[i] = v
-		}
-		rows.AddRow(values...)
+		// part of the current row
+		rowLines = append(rowLines, line)
 	}
 
 	if rows == nil {
@@ -1765,4 +1859,30 @@ func prepareMockRows(data []byte) (*sqlmock.Rows, error) {
 	}
 
 	return rows, sc.Err()
+}
+
+func splitCells(s string) []string {
+	parts := strings.Split(strings.Trim(s, "|"), "|")
+	for i := range parts {
+		parts[i] = strings.TrimSpace(parts[i])
+	}
+	return parts
+}
+
+func buildRow(lines []string, cols int) ([]driver.Value, error) {
+	row := strings.Join(lines, "\n")
+	if !strings.HasPrefix(row, "|") || !strings.HasSuffix(row, "|") {
+		return nil, errors.New("prepareMockRows(): malformed row")
+	}
+
+	parts := strings.Split(strings.Trim(row, "|"), "|")
+	if len(parts) != cols {
+		return nil, fmt.Errorf("prepareMockRows(): columns != values (%d/%d)", cols, len(parts))
+	}
+
+	vals := make([]driver.Value, cols)
+	for i, c := range parts {
+		vals[i] = strings.Trim(c, " ")
+	}
+	return vals, nil
 }
