@@ -65,6 +65,7 @@ func (m *MySQL) collect() (map[string]int64, error) {
 	mx["innodb_log_file_size"] = m.varInnoDBLogFileSize
 	mx["innodb_log_files_in_group"] = m.varInnoDBLogFilesInGroup
 	mx["innodb_log_group_capacity"] = m.varInnoDBLogFileSize * m.varInnoDBLogFilesInGroup
+	mx["innodb_log_occupancy"] = 100 * 1000 * mx["innodb_checkpoint_age"] / mx["innodb_log_group_capacity"]
 	mx["max_connections"] = m.varMaxConns
 	mx["table_open_cache"] = m.varTableOpenCache
 
